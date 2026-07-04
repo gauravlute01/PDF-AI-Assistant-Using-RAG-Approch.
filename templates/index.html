@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDF AI Chat</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
+body{
+background:linear-gradient(135deg,#fff,#ffeef5);
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+padding:20px;
+}
+.container{
+width:100%;
+max-width:700px;
+background:white;
+border-radius:20px;
+padding:35px;
+box-shadow:0 10px 35px rgba(255,182,193,0.25);
+}
+h1{
+text-align:center;
+color:#e75480;
+margin-bottom:30px;
+font-size:32px;
+}
+.section{margin-bottom:30px;}
+.section-title{
+color:#444;
+font-size:18px;
+margin-bottom:12px;
+font-weight:bold;
+}
+input[type="file"]{
+width:100%;
+padding:12px;
+border:2px dashed #f7b6c2;
+border-radius:12px;
+background:#fff7fa;
+cursor:pointer;
+}
+input[type="text"]{
+width:100%;
+padding:15px;
+border:2px solid #ffd6e0;
+border-radius:12px;
+outline:none;
+margin-bottom:15px;
+font-size:15px;
+}
+input[type="text"]:focus{border-color:#e75480;}
+button{
+width:100%;
+padding:14px;
+border:none;
+border-radius:12px;
+background:#e75480;
+color:white;
+font-size:16px;
+font-weight:bold;
+cursor:pointer;
+transition:0.3s;
+}
+button:hover{
+background:#d63f6f;
+transform:translateY(-2px);
+}
+.answer-box{
+margin-top:20px;
+min-height:120px;
+background:#fff7fa;
+border:2px solid #ffd6e0;
+border-radius:15px;
+padding:20px;
+color:#333;
+line-height:1.6;
+}
+.status{
+margin-top:10px;
+color:#e75480;
+font-size:14px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>PDF AI Assistant</h1>
+
+<div class="section">
+<div class="section-title">Upload your PDF</div>
+
+<input type="file" id="pdfFile" accept=".pdf">
+
+<br><br>
+
+<button onclick="uploadPDF()">Upload PDF</button>
+
+<p class="status" id="uploadStatus"></p>
+</div>
+
+<div class="section">
+<div class="section-title">Ask Questions</div>
+
+<input type="text" id="question" placeholder="Ask anything from your PDF...">
+
+<button onclick="askQuestion()">Ask AI</button>
+</div>
+
+<div class="answer-box" id="answer">
+Your answer will appear here...
+</div>
+
+</div>
+
+<script>
+
+async function uploadPDF(){
+
+const file=document.getElementById("pdfFile").files[0];
+
+if(!file){
+alert("Please select a PDF");
+return;
+}
+
+const formData=new FormData();
+
+formData.append("pdf",file);
+
+document.getElementById("uploadStatus").innerText="Uploading...";
+
+const response=await fetch("/upload",{
+method:"POST",
+body:formData
+});
+
+const data=await response.json();
+
+document.getElementById("uploadStatus").innerText=data.message;
+}
+
+async function askQuestion(){
+
+const question=document.getElementById("question").value;
+
+if(!question){
+alert("Enter a question");
+return;
+}
+
+document.getElementById("answer").innerText="Thinking...";
+
+const response=await fetch("/ask",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+question:question
+})
+});
+
+const data=await response.json();
+
+document.getElementById("answer").innerText=data.answer;
+}
+
+</script>
+
+</body>
+</html>
